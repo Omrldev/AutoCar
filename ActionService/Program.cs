@@ -13,6 +13,8 @@ builder.Services.AddDbContext<AuctionDbContext>(opt =>
     opt.UseNpgsql(connection);
 });
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 
 var app = builder.Build();
 
