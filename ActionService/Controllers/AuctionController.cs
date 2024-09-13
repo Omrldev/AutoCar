@@ -45,5 +45,25 @@ namespace ActionService.Controllers
 
             return _mapper.Map<AuctionDto>(auction);
         }
+
+        [HttpPost]
+        public async Task<ActionResult<AuctionDto>> CreateAuction(CreateAuctionDto createAuctionDto)
+        {
+            var auction = _mapper.Map<Auction>(createAuctionDto);
+
+            // TO DO: add user as a seller
+            auction.Seller = "test";
+
+            _context.Auctions.Add(auction);
+
+            var result = await _context.SaveChangesAsync() > 0;
+
+            if (!result) return BadRequest("--> We can not save changes in the database");
+
+            return CreatedAtAction(nameof(GetAuctionById), 
+                new {auction.Id}, _mapper.Map<AuctionDto>(auction));
+        }
+
+        
     }
 }
