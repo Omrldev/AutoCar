@@ -67,9 +67,9 @@ namespace ActionService.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateAuction(Guid id, UpdateAuctionDto updateAuctionDto)
         {
-            var auction = _context.Auctions
+            var auction = await _context.Auctions
                 .Include (x => x.Item)
-                .FirstOrDefault(x => x.Id == id);
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (auction == null) return NotFound();
 
@@ -81,6 +81,23 @@ namespace ActionService.Controllers
             var result = await _context.SaveChangesAsync() > 0;
 
             if (!result) return BadRequest("--> Problem updating auction");
+
+            return Ok();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteAuction(Guid id)
+        {
+            var auction = await _context.Auctions
+                .FindAsync(id);
+
+            if (auction == null) return NotFound();
+
+            _context.Auctions.Remove(auction);
+
+            var result = await _context.SaveChangesAsync() > 0;
+
+            if (!result) return BadRequest("--> Problem deleting the auction");
 
             return Ok();
         }
