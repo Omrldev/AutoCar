@@ -58,12 +58,31 @@ namespace ActionService.Controllers
 
             var result = await _context.SaveChangesAsync() > 0;
 
-            if (!result) return BadRequest("--> We can not save changes in the database");
+            if (!result) return BadRequest("--> Problem to create a auction");
 
             return CreatedAtAction(nameof(GetAuctionById), 
                 new {auction.Id}, _mapper.Map<AuctionDto>(auction));
         }
 
-        
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateAuction(Guid id, UpdateAuctionDto updateAuctionDto)
+        {
+            var auction = _context.Auctions
+                .Include (x => x.Item)
+                .FirstOrDefault(x => x.Id == id);
+
+            if (auction == null) return NotFound();
+
+            auction.Item.Make = updateAuctionDto.Make ?? auction.Item.Make;
+            auction.Item.Color = updateAuctionDto.Color ?? auction.Item.Color;
+            auction.Item.Model = updateAuctionDto.Model ?? auction.Item.Model;
+            auction.Item.Mileage = updateAuctionDto.Mileage ?? auction.Item.Mileage;
+
+            var result = await _context.SaveChangesAsync() > 0;
+
+            if (!result) return BadRequest("--> Problem updating auction");
+
+            return Ok();
+        }
     }
 }
