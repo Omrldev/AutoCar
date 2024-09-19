@@ -4,6 +4,7 @@ using MongoDB.Driver.Core.WireProtocol.Messages;
 using MongoDB.Entities;
 using Polly;
 using Polly.Extensions.Http;
+using SearchService.Consumers;
 using SearchService.Data;
 using SearchService.Models;
 using SearchService.Services;
@@ -18,8 +19,15 @@ builder.Services.AddControllers();
 builder.Services.AddHttpClient<AuctionSvcHttpClient>()
     .AddPolicyHandler(GetPolicy());
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 builder.Services.AddMassTransit(x =>
 {
+    x.AddConsumersFromNamespaceContaining<AuctionCreatedConsumer>();
+
+    x.SetEndpointNameFormatter
+        (new KebabCaseEndpointNameFormatter("search", false));
+
     x.UsingRabbitMq((context, config) =>
     {
         config.ConfigureEndpoints(context);
