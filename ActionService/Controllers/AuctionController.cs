@@ -2,6 +2,9 @@
 using ActionService.DTOs;
 using ActionService.Entities;
 using AutoMapper;
+using Contracts;
+using MassTransit;
+using MassTransit.Testing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,11 +16,13 @@ namespace ActionService.Controllers
     {
         private readonly AuctionDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IPublishEndpoint _publishEndpoint; 
 
-        public AuctionController(AuctionDbContext context, IMapper mapper)
+        public AuctionController(AuctionDbContext context, IMapper mapper, IPublishEndpoint publishEndpoint)
         {
             _context = context;
             _mapper = mapper;
+            _publishEndpoint = publishEndpoint;
         }
 
         [HttpGet]
@@ -74,13 +79,35 @@ namespace ActionService.Controllers
                 return NotFound();
             }
 
-            return _mapper.Map<AuctionDto>(auction);
+            AuctionDto auctionDto = new()
+            {
+                Id = auction.Id,
+                ReservePrice = auction.ReservePrice,
+                Seller = auction.Seller,
+                Winner = auction.Winner,
+                SoldAmount = auction.SoldAmount.GetValueOrDefault(),
+                CurrentHighBid = auction.CurrentHighBid.GetValueOrDefault(),
+                CreateAt = auction.CreateAt,
+                UpdateAt = auction.UpdateAt,
+                AuctionEnd = auction.AuctionEnd,
+                Status = auction.Status.ToString(),
+                Make = auction.Item.Make,
+                Model = auction.Item.Model,
+                Year = auction.Item.Year,
+                Color = auction.Item.Color,
+                Mileage = auction.Item.Mileage,
+                ImageUrl = auction.Item.ImageUrl
+            };
+
+            return auctionDto;
+
+            //return _mapper.Map<AuctionDto>(auction);
         }
 
         [HttpPost]
         public async Task<ActionResult<AuctionDto>> CreateAuction(CreateAuctionDto createAuctionDto)
         {
-            var auction = _mapper.Map<Auction>(createAuctionDto);
+            var auction = _mapper.Map<Auction>(createAuctionDto);            
 
             // TO DO: add user as a seller
             auction.Seller = "test";
@@ -89,10 +116,14 @@ namespace ActionService.Controllers
 
             var result = await _context.SaveChangesAsync() > 0;
 
+            var newAuction = _mapper.Map<AuctionDto>(auction);
+
+            await _publishEndpoint.Publish(_mapper.Map<ActionCreated>(newAuction));
+
             if (!result) return BadRequest("--> Problem to create a auction");
 
             return CreatedAtAction(nameof(GetAuctionById), 
-                new {auction.Id}, _mapper.Map<AuctionDto>(auction));
+                new {auction.Id}, newAuction);
         }
 
         [HttpPut("{id}")]
