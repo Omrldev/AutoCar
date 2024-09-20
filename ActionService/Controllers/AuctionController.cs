@@ -114,11 +114,11 @@ namespace ActionService.Controllers
 
             _context.Auctions.Add(auction);
 
-            var result = await _context.SaveChangesAsync() > 0;
-
             var newAuction = _mapper.Map<AuctionDto>(auction);
 
             await _publishEndpoint.Publish(_mapper.Map<ActionCreated>(newAuction));
+
+            var result = await _context.SaveChangesAsync() > 0;
 
             if (!result) return BadRequest("--> Problem to create a auction");
 
