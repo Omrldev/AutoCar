@@ -21,7 +21,7 @@ namespace SearchService.Consumers
 
             //var item = _mapper.Map<Item>(context);
 
-            Item item = new ()
+            var item = new Item()
             {
                 ID = context.Message.Id.ToString(),
                 ReservePrice = context.Message.ReservePrice,
@@ -40,6 +40,9 @@ namespace SearchService.Consumers
                 Mileage = context.Message.Mileage,
                 ImageUrl = context.Message.ImageUrl,
             };
+
+            if (item.Model == "Anonymous")
+                throw new ArgumentException("--> Can not seel cars with name anonymous");
 
             await item.SaveAsync();
 
