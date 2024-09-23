@@ -140,6 +140,8 @@ namespace ActionService.Controllers
             auction.Item.Model = updateAuctionDto.Model ?? auction.Item.Model;
             auction.Item.Mileage = updateAuctionDto.Mileage ?? auction.Item.Mileage;
 
+            await _publishEndpoint.Publish(_mapper.Map<AuctionUpdated>(auction));
+
             var result = await _context.SaveChangesAsync() > 0;
 
             if (!result) return BadRequest("--> Problem updating auction");
@@ -156,6 +158,9 @@ namespace ActionService.Controllers
             if (auction == null) return NotFound();
 
             _context.Auctions.Remove(auction);
+
+            await _publishEndpoint.Publish<AuctionDeleted>
+                (new { Id = auction.Id.ToString()});
 
             var result = await _context.SaveChangesAsync() > 0;
 

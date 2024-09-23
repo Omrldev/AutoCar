@@ -12,6 +12,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["ActionService/ActionService.csproj", "ActionService/"]
+COPY ["Contracts/Contracts.csproj", "Contracts/"]
 RUN dotnet restore "./ActionService/ActionService.csproj"
 COPY . .
 WORKDIR "/src/ActionService"

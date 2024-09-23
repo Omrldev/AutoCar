@@ -9,6 +9,7 @@ namespace SearchService.RequestHelpers
         public MappingProfile()
         {
             CreateMap<ActionCreated, Item>();
+            CreateMap<AuctionUpdated, Item>();
         }
     }
 }
