@@ -78,8 +78,8 @@ namespace ActionService.Controllers
             {
                 return NotFound();
             }
-
-            AuctionDto auctionDto = new()
+            
+            var auctionDto = new AuctionDto()
             {
                 Id = auction.Id,
                 ReservePrice = auction.ReservePrice,
