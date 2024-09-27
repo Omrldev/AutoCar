@@ -5,6 +5,7 @@ using AutoMapper;
 using Contracts;
 using MassTransit;
 using MassTransit.Testing;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -104,13 +105,14 @@ namespace ActionService.Controllers
             //return _mapper.Map<AuctionDto>(auction);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<AuctionDto>> CreateAuction(CreateAuctionDto createAuctionDto)
         {
             var auction = _mapper.Map<Auction>(createAuctionDto);            
 
             // TO DO: add user as a seller
-            auction.Seller = "test";
+            auction.Seller = User.Identity.Name;
 
             _context.Auctions.Add(auction);
 
@@ -126,6 +128,7 @@ namespace ActionService.Controllers
                 new {auction.Id}, newAuction);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateAuction(Guid id, UpdateAuctionDto updateAuctionDto)
         {
@@ -134,6 +137,9 @@ namespace ActionService.Controllers
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             if (auction == null) return NotFound();
+
+            // check seller == username
+            if (auction.Seller != User.Identity.Name) return Forbid();
 
             auction.Item.Make = updateAuctionDto.Make ?? auction.Item.Make;
             auction.Item.Color = updateAuctionDto.Color ?? auction.Item.Color;
@@ -149,6 +155,7 @@ namespace ActionService.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteAuction(Guid id)
         {
@@ -156,6 +163,9 @@ namespace ActionService.Controllers
                 .FindAsync(id);
 
             if (auction == null) return NotFound();
+
+            // check seller == username
+            if (auction.Seller != User.Identity.Name) return Forbid();
 
             _context.Auctions.Remove(auction);
 
