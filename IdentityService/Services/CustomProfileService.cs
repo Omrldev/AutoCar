@@ -23,7 +23,7 @@ namespace IdentityService.Services
 
             var claims = new List<Claim>
             {
-                new Claim("username", user.UserName)
+                new("username", user.UserName)
             };
 
             context.IssuedClaims.AddRange(claims);
