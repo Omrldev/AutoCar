@@ -13,6 +13,9 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["ActionService/ActionService.csproj", "ActionService/"]
 COPY ["Contracts/Contracts.csproj", "Contracts/"]
+COPY ["SearchService/SearchService.csproj", "SearchService/"]
+COPY ["IdentityService/IdentityService.csproj", "IdentityService/"]
+COPY ["GatewayService/GatewayService.csproj", "GatewayService/"]
 RUN dotnet restore "./ActionService/ActionService.csproj"
 COPY . .
 WORKDIR "/src/ActionService"
