@@ -13,7 +13,7 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityService", "IdentityService\IdentityService.csproj", "{F7ED6296-5E16-4B66-87EF-57B53DB8D38C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GatewayService", "GatewayService\GatewayService.csproj", "{C901A4A9-5480-4ABB-B639-75FF5910ADB2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GatewayService", "GatewayService\GatewayService.csproj", "{C901A4A9-5480-4ABB-B639-75FF5910ADB2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
