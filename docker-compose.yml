@@ -26,3 +26,19 @@ services:
     ports:
         - 5672:5672
         - 15672:15672
+  auction-svc:
+    image: xledejos/auction-svc:latest
+    build:
+        context: .
+        dockerfile: ActionService/Dockerfile
+    environment:
+        - ASPNETCORE_ENVIROMENT=Development
+        - ASPNETCORE_URLS=http://+:8080
+        - RabbitMq__Host=rabbitmq
+        - ConnectionStrings__DefaultConnection=Server=postgres:5432;Username=postgres;Password=postgres;Database=auctions
+        - IdentityServiceUrl=http://identity-svc
+    ports:
+        - 7001:8080
+    depends_on:
+        - postgres
+        - rabbitmq
