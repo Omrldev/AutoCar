@@ -42,3 +42,19 @@ services:
     depends_on:
         - postgres
         - rabbitmq
+  search-svc:
+    image: xledejos/search-svc:latest
+    build:
+        context: .
+        dockerfile: SearchService/Dockerfile
+    environment:
+        - ASPNETCORE_ENVIROMENT=Development
+        - ASPNETCORE_URLS=http://+:8080
+        - RabbitMq__Host=rabbitmq
+        - ConnectionStrings__MongoDbConnection=mongodb://root:root@mongodb
+        - AuctionServiceUrl=http://auction-svc
+    ports:
+        - 7002:8080
+    depends_on:
+        - mongodb
+        - rabbitmq
