@@ -4,6 +4,7 @@ services:
     build:
       context: .
       dockerfile: ActionService/Dockerfile
+
   postgres:
     image: postgres
     environment:
@@ -12,6 +13,7 @@ services:
         - 5432:5432
     volumes:
         - /var/lib/postgresql/data
+
   mongodb:
     image: mongo
     environment:
@@ -21,11 +23,13 @@ services:
         - 27017:27017
     volumes:
         - /data/db 
+
   rabbitmq:
     image: rabbitmq:3-management-alpine
     ports:
         - 5672:5672
         - 15672:15672
+
   auction-svc:
     image: xledejos/auction-svc:latest
     build:
@@ -42,6 +46,7 @@ services:
     depends_on:
         - postgres
         - rabbitmq
+
   search-svc:
     image: xledejos/search-svc:latest
     build:
@@ -58,3 +63,17 @@ services:
     depends_on:
         - mongodb
         - rabbitmq
+
+  identity-svc:
+    image: xledejos/identity-svc:latest
+    build:
+        context: .
+        dockerfile: IdentityService/Dockerfile
+    environment:
+        - ASPNETCORE_ENVIROMENT=Development
+        - ASPNETCORE_URLS=http://+:8080
+        - ConnectionStrings__DefaultConnection=Server=postgres:5432;Username=postgres;Password=postgres;Database=identity
+    ports:
+        - 5000:8080
+    depends_on:
+        - postgres
